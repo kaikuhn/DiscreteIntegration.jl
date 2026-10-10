@@ -5,6 +5,7 @@ DocMeta.setdocmeta!(DiscreteIntegration, :DocTestSetup, :(using DiscreteIntegrat
 
 makedocs(;
     modules=[DiscreteIntegration],
+    checkdocs = :exports,
     authors="Kai-Jonathan Kuhn <kai-jonathan.kuhn@uni-bayreuth.de> and contributors",
     sitename="DiscreteIntegration.jl",
     format=Documenter.HTML(;

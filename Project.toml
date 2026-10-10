@@ -1,13 +1,7 @@
 name = "DiscreteIntegration"
 uuid = "daf325a7-8568-4757-928b-5616cda5fa70"
+version = "0.1.0"
 authors = ["Kai-Jonathan Kuhn <kai-jonathan.kuhn@uni-bayreuth.de> and contributors"]
-version = "1.0.0-DEV"
 
 [compat]
 julia = "1.10"
-
-[extras]
-Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
-
-[targets]
-test = ["Test"]
