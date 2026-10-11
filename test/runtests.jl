@@ -46,7 +46,6 @@ end
         
         for (f, F) in [(linear, linear_int), (quadratic, quadratic_int)]
 
-            
             # calc y_array
             y = f.(x)
 
@@ -57,6 +56,34 @@ end
             @test isapprox(cumul_integrate(step(x), y, Simpson()) .- (F.(x) .- F(x[begin])), zeros(length(x)), atol= 1e-12)
         end
     end
+
+    # non-uniform grid
+    ##################
+
+    x_nu_even = [1, 1.1, 1.3, 1.35, 1.4, 1.6, 1.9, 2.0]
+    x_nu_odd  = [1, 1.1, 1.3, 1.35, 1.4, 1.6, 1.9, 1.95, 2.0]
+
+    @test isapprox(integrate(x_nu_even, linear.(x_nu_even)) - (linear_int(x_nu_even[end]) - linear_int(x_nu_even[begin])), 0, atol=1e-12)
+    @test isapprox(integrate(x_nu_odd, linear.(x_nu_odd)) - (linear_int(x_nu_odd[end]) - linear_int(x_nu_odd[begin])), 0, atol=1e-12)
+
+    @test isapprox(cumul_integrate(x_nu_even, linear.(x_nu_even)) .- (linear_int.(x_nu_even) .- linear_int(x_nu_even[begin])), zeros(length(x_nu_even)), atol=1e-12)
+    @test isapprox(cumul_integrate(x_nu_odd, linear.(x_nu_odd)) .- (linear_int.(x_nu_odd) .- linear_int(x_nu_odd[begin])), zeros(length(x_nu_odd)), atol=1e-12)
+
+    @test isapprox(integrate(x_nu_even, quadratic.(x_nu_even), Simpson()) - (quadratic_int(x_nu_even[end]) - quadratic_int(x_nu_even[begin])), 0, atol=1e-12)
+    @test isapprox(integrate(x_nu_odd, quadratic.(x_nu_odd), Simpson()) - (quadratic_int(x_nu_odd[end]) - quadratic_int(x_nu_odd[begin])), 0, atol=1e-12)
+
+    @test isapprox(cumul_integrate(x_nu_even, quadratic.(x_nu_even), Simpson()) .- (quadratic_int.(x_nu_even) .- quadratic_int(x_nu_even[begin])), zeros(length(x_nu_even)), atol=1e-12)
+    @test isapprox(cumul_integrate(x_nu_odd, quadratic.(x_nu_odd), Simpson()) .- (quadratic_int.(x_nu_odd) .- quadratic_int(x_nu_odd[begin])), zeros(length(x_nu_odd)), atol=1e-12)
+
+    # cumul_integrate!
+    ##################
+
+    x = 1:0.1:2
+    y = quadratic.(x)
+    @test isapprox(cumul_integrate!(y, x, y) .- (quadratic_int.(x) - quadratic_int(x[begin])), zeros(length(x)), atol=1e-12)
+    
+    y = quadratic.(x)
+    @test isapprox(cumul_integrate!(y, step(x), y) .- (quadratic_int.(x) - quadratic_int(x[begin])), zeros(length(x)), atol=1e-12)
 end
 
 
@@ -129,4 +156,40 @@ end
         @test alloc(integrate, x_off, y_off, m) < 100
         @test alloc(integrate, step(x), y_off, m) < 100
     end
+end
+
+@testset "ArgumentError" begin
+
+    xr1 = 1:1
+    xr2 = 1:2
+
+    f(x) = x
+    
+    @test_throws ArgumentError integrate(xr1, f.(xr1))
+    @test_throws ArgumentError integrate(xr2, f.(xr2), Simpson())
+    @test_throws ArgumentError integrate(1, f.(xr1))
+    @test_throws ArgumentError integrate(1, f.(xr2), Simpson())
+
+    @test_throws ArgumentError cumul_integrate(xr1, f.(xr1))
+    @test_throws ArgumentError cumul_integrate(xr2, f.(xr2), Simpson())
+    @test_throws ArgumentError cumul_integrate(1, f.(xr1))
+    @test_throws ArgumentError cumul_integrate(1, f.(xr2), Simpson())
+end
+
+@testset "DimensionMismatch" begin
+    
+    x1 = 1:20
+    x2 = 1:21
+    dest = zeros(Float64, 21)
+
+    f(x) = x
+    
+    @test_throws DimensionMismatch integrate(x2, f.(x1))
+    @test_throws DimensionMismatch integrate(x2, f.(x1), Simpson())
+
+    @test_throws DimensionMismatch cumul_integrate(x2, f.(x1))
+    @test_throws DimensionMismatch cumul_integrate(x2, f.(x1), Simpson())
+
+    @test_throws DimensionMismatch cumul_integrate!(dest, x2, f.(x1))
+    @test_throws DimensionMismatch cumul_integrate!(dest, x2, f.(x1), Simpson())
 end
