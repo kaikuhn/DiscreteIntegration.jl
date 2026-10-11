@@ -1,6 +1,6 @@
 # DiscreteIntegration
 
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://kaikuhn.github.io/DiscreteIntegration.jl/stable/)
+<!-- [![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://kaikuhn.github.io/DiscreteIntegration.jl/stable/) -->
 [![Dev](https://img.shields.io/badge/docs-dev-blue.svg)](https://kaikuhn.github.io/DiscreteIntegration.jl/dev/)
 [![Build Status](https://github.com/kaikuhn/DiscreteIntegration.jl/actions/workflows/CI.yml/badge.svg?branch=main)](https://github.com/kaikuhn/DiscreteIntegration.jl/actions/workflows/CI.yml?query=branch%3Amain)
 
@@ -15,11 +15,27 @@ Numerical integration of discrete data on uniform (`Δx`) or non-uniform (`x`) g
 - Computation in at least `Float64`, also for `Float32` and integer input
 - Works with non-1-based indices (e.g. OffsetArrays)
 
+## Relation to NumericalIntegration.jl
+
+DiscreteIntegration.jl and [NumericalIntegration.jl](https://github.com/JuliaMath/NumericalIntegration.jl) both integrate sampled data, so their basic use case overlaps. Main differences:
+
+- **Single pass:** `x` and `y` are each accessed exactly once per element, so lazy arrays (e.g. from [LazyArrays.jl](https://github.com/JuliaArrays/LazyArrays.jl)) are evaluated only once and no temporary arrays are needed.
+- **Simpson's rule on uniform grids:** the composite Simpson 1/3 rule is used, with the 3/8 rule for the last interval if the number of points is even.
+- **Simpson's rule on non-uniform grids:** a composite Simpson's rule for irregularly spaced data, with a correction for the last interval if the number of points is even.
+- **In-place cumulative integrals:** `cumul_integrate!` writes directly into a provided `dest` vector, which may be identical to `x` or `y`. Computation uses at least `Float64`, the element type of `dest` is chosen by the caller.
+- **No low-order start value:** all elements of the cumulative integral are computed with Simpson's rule.
+- **Uniform grids without `x`:** pass only the spacing `Δx`.
+- **Non-1-based indices** (e.g. OffsetArrays) are supported.
+
+Use DiscreteIntegration.jl if you work with LazyArrays.jl, need the classical 1/3 Simpson's rule or a Simpson's rule on non-uniform grids. Use NumericalIntegration.jl for maximum speed (using `TrapezoidalFast()` or `SimpsonEvenFast()`), or if you need the methods it offers, that are not available here (for example Romberg).
+
+Currently available are the Trapezoidal rule and Simpson's rule.
+
 ## Installation
 
 ```julia
 using Pkg
-Pkg.add(url = "https://github.com/DEIN_NAME/DiscreteIntegration.jl")
+Pkg.add(url = "https://github.com/kaikuhn/DiscreteIntegration.jl")
 ```
 
 (After registration: `Pkg.add("DiscreteIntegration")`.)
@@ -68,7 +84,7 @@ cumul_integrate!(dest, x, y, Simpson())
 
 ## Documentation
 
-See the [documentation](https://DEIN_NAME.github.io/DiscreteIntegration.jl/dev/) for the full API.
+See the [documentation](https://kaikuhn.github.io/DiscreteIntegration.jl/dev/) for the full API.
 
 ## License
 
