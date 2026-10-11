@@ -443,13 +443,13 @@ function _cumul_integrate!(
     
     @inbounds begin
 
-        # calc first value
-        dest[id + 1] = zero(eltype(dest))
-
         # cache first three y values
         y1 = T(y[iy + 1])
         y2 = T(y[iy + 2])
         y3 = T(y[iy + 3])
+
+        # calc first value
+        dest[id + 1] = zero(eltype(dest))
 
         # if length is 3, calculate with quadratic fit 
         if len_y == 3

@@ -80,10 +80,10 @@ end
 
     x = 1:0.1:2
     y = quadratic.(x)
-    @test isapprox(cumul_integrate!(y, x, y) .- (quadratic_int.(x) - quadratic_int(x[begin])), zeros(length(x)), atol=1e-12)
+    @test isapprox(cumul_integrate!(y, x, y, Simpson()) .- (quadratic_int.(x) .- quadratic_int(x[begin])), zeros(length(x)), atol=1e-12)
     
     y = quadratic.(x)
-    @test isapprox(cumul_integrate!(y, step(x), y) .- (quadratic_int.(x) - quadratic_int(x[begin])), zeros(length(x)), atol=1e-12)
+    @test isapprox(cumul_integrate!(y, step(x), y, Simpson()), (quadratic_int.(x) .- quadratic_int(x[begin])), atol=1e-12)
 end
 
 
