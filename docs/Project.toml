@@ -1,3 +1,6 @@
 [deps]
 DiscreteIntegration = "daf325a7-8568-4757-928b-5616cda5fa70"
 Documenter = "e30172f5-a6a5-5a46-863b-614d45cd2de4"
+
+[compat]
+DiscreteIntegration = "0.1.0"
