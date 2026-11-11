@@ -1,5 +1,8 @@
 using DiscreteIntegration
 using Documenter
+if isdefined(Main, :Revise)
+    Main.Revise.revise()
+end
 
 DocMeta.setdocmeta!(DiscreteIntegration, :DocTestSetup, :(using DiscreteIntegration); recursive=true)
 
